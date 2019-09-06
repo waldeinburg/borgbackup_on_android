@@ -19,7 +19,9 @@ s=`bash ../sync_file_range_test/test.sh`
 if [ "$s" = "1" ];
 then
 	echo "patching borg to not use sync_file_range...."
-	git apply ../borg_sync_file_range.patch
+	#Patches will break if the line numbers change.
+	#The following should work even if the parameter is renamed and the indentation changes.
+	perl -0777 -p -i -e 's/( +)(if sync_file_range\((.+?),.+\n\1)(    .+)/\1os.fdatasync(\3)\n\1#\2#\4/' src/borg/platform/linux.pyx
 else
 	echo "no need to patch borg"
 fi
